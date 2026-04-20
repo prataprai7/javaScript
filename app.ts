@@ -5,6 +5,27 @@ const app: Application = express();
 app.use(express.json()); //use json a request
 app.use(express.urlencoded({extended: true})); //use form-urlencoded as request
 
+type Product ={
+    id: number;
+    name: string;
+    price: number;
+    category? : string;
+}
+const products: Product[]=[
+    {id:1, name: 'Apple', price: 250, category: 'A'},
+    {id:2, name: 'Orange', price: 200, category: 'B'},
+    {id:3, name: 'Mango', price: 220, category: 'A'},
+    {id:4, name: 'Banana', price: 350, category: 'C'},
+    {id:5, name: 'Cherry', price: 300, category: 'B'},
+
+];
+//task fill this products array with 5 products
+// 1. Make all 5 api endpoints for products
+// On create and update, request.body, if name and price is not provided
+// default to "Unknown Product" and 0 respectively
+// On each find query, if not found return 404 with message "Product not found"
+
+
 const data = [
     {id: 1, name: 'Jo', age: 30},
     {id: 2, name: 'No', age: 31},
@@ -20,6 +41,13 @@ app.get(
     }
 );
 
+app.get(
+    "/api/products",
+    (req: Request, res: Response)=>{
+        return res.status(404).json(data)
+    }
+);
+
 //2. GET by id-Get one
 app.get(
     "/api/persons/:id",
@@ -29,6 +57,21 @@ app.get(
         return res.status(200).json(person);
     }
 );
+
+app.get(
+  "/api/products/:id",
+  (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const product = products.find(p => p.id === id);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+  }
+);
+
 //3. POST-Create
 app.post(
     "/api/persons",
@@ -41,6 +84,21 @@ app.post(
         }
         data.push(newPerson);
         return res.status(201).json(newPerson);
+    }
+);
+
+app.post(
+    "/api/products",
+    (req: Request, res: Response)=>{
+        const {name, product} = req.body;
+        const newProduct= {
+            id: product.length+1,
+            name: name || 'Unknown Product',
+            price: price || 0,
+            category
+        };
+        product.push(newProduct);
+        return res.status(404).json(newProduct);
     }
 );
 //Update (get one and update)
@@ -62,9 +120,30 @@ app.put(
         return res.status(200).json(updatePerson);
     }
 );
+
+app.put(
+    "/products/:id",
+    (req: Request, res: Response) => {
+    const id = parseInt(req.params.id);
+    const product = products.find(p => p.id === id);
+
+    if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+    }
+
+    const { name, price, category } = req.body;
+
+    product.name = name || "Unknown Product";
+    product.price = price || 0;
+    product.category = category;
+
+    res.json(product);
+    }
+);
+
 //5. DELETE - delete one
 app.delete(
-    "api/perons/:id",
+    "api/persons/:id",
     (req: Request, res: Response)=>{
         const {id}= req.params; 
         const personIndex = data.findIndex(p=> p.id === parseInt(id as string));
@@ -72,6 +151,27 @@ app.delete(
         return res.status(204).json({message: "Person deleted"});
     }
 );
+
+app.delete(
+    "/products/:id", 
+    (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const index = products.findIndex(
+        (p) => p.id === parseInt(id)
+    );
+
+    if (index === -1) {
+        return res.status(404).json({
+        message: "Product not found"
+        });
+    }
+
+    const deleted = products.splice(index, 1);
+    res.json(deleted[0]);
+    }
+);
+
 
 app.get(
     '/hello',//declaring the path
@@ -114,3 +214,4 @@ app.listen(
 );
 //execute script: npx tsx --watch app.ts
 //http://localhost:8088
+
