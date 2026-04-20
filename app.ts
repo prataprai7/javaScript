@@ -22,7 +22,7 @@ app.get(
 
 //2. GET by id-Get one
 app.get(
-    "/api/person/:id",
+    "/api/persons/:id",
     (req: Request, res: Response)=>{
         const {id} = req. params; //:id
         const person = data.find(p => p.id == parseInt(id as string));
@@ -31,7 +31,7 @@ app.get(
 );
 //3. POST-Create
 app.post(
-    "/api/person",
+    "/api/persons",
     (req: Request, res: Response)=>{
         const {name, age}= req.body; //client request body
         const newPerson= {
@@ -42,7 +42,37 @@ app.post(
         data.push(newPerson);
         return res.status(201).json(newPerson);
     }
-)
+);
+//Update (get one and update)
+//4.1 PUT - update whole/most resource
+//4.2 PATCH - update part of resource
+app.put(
+    "/api/persons/:id",
+    (req: Request, res: Response)=>{
+        const {id} = req.params; //:id
+        const {name, age} = req.body; //client request body
+        const personIndex = data.findIndex(p => p.id === parseInt(id as string));
+
+        const updatePerson = {
+            name,
+            age
+        }
+        data[personIndex] = {...data[personIndex], ...updatePerson};
+
+        return res.status(200).json(updatePerson);
+    }
+);
+//5. DELETE - delete one
+app.delete(
+    "api/perons/:id",
+    (req: Request, res: Response)=>{
+        const {id}= req.params; 
+        const personIndex = data.findIndex(p=> p.id === parseInt(id as string));
+        data.splice(personIndex,1);
+        return res.status(204).json({message: "Person deleted"});
+    }
+);
+
 app.get(
     '/hello',//declaring the path
     (req: Request, res: Response) => {
