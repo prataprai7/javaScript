@@ -2,6 +2,47 @@ import express, { Application, Request, Response} from 'express';
 
 const app: Application = express();
 
+app.use(express.json()); //use json a request
+app.use(express.urlencoded({extended: true})); //use form-urlencoded as request
+
+const data = [
+    {id: 1, name: 'Jo', age: 30},
+    {id: 2, name: 'No', age: 31},
+    {id: 3, name: 'Bo', age: 33},
+]
+//5.major api endpoints:
+//1.GET all
+app.get(
+    "/api/persons",
+    (req: Request, res: Response)=> {
+        //later paginated results
+        return res.status(200).json(data)
+    }
+);
+
+//2. GET by id-Get one
+app.get(
+    "/api/person/:id",
+    (req: Request, res: Response)=>{
+        const {id} = req. params; //:id
+        const person = data.find(p => p.id == parseInt(id as string));
+        return res.status(200).json(person);
+    }
+);
+//3. POST-Create
+app.post(
+    "/api/person",
+    (req: Request, res: Response)=>{
+        const {name, age}= req.body; //client request body
+        const newPerson= {
+            id: data.length+1,
+            name,
+            age
+        }
+        data.push(newPerson);
+        return res.status(201).json(newPerson);
+    }
+)
 app.get(
     '/hello',//declaring the path
     (req: Request, res: Response) => {
@@ -33,7 +74,7 @@ app.get(
     }
 );
 
-const PORT: number = 8080;
+const PORT: number = 8088;
 
 app.listen(
     PORT,
