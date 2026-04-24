@@ -48,4 +48,33 @@ async createPerson (req: Request, res: Response){
     data.push(newPerson);
     return ApiResponseHelper.success(res, newPerson, 201, "Person create");
 }
+
+// create a function updatePerson
+    // 1. find person by id, if not found 
+    // throw 404 with message "Person not found"
+    // 2. if name or age is not provided in request body,
+    // default to existing person's name and age
+    // 3. update the person's name and age with request body
+    // 4. return the updated person with consistent api response
+    // 5. implement in router -> /api/persons/:id [PUT]
+
+async updatePerson(req: Request, res: Response){
+    const {name, age, id}= req.body;
+    if(!id){
+        throw new HttpException(404, "Person not found");
+    }
+    if(!name){
+        throw new HttpException(404, "Name is required");
+    }
+    if(!age){
+        throw new HttpException(404, "Age is required");
+    }
+    const newPerson = {
+        id: data.length + 1,
+        name,
+        age
+    }
+    data.push(newPerson);
+    return ApiResponseHelper.success(res, newPerson, 201, "Person update")
+}
 }
