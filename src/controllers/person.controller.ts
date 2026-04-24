@@ -27,4 +27,25 @@ export class PersonController{
             );
         }
     }
+// efficient api desing
+// 1.logic through exception handling
+// 2.consistent api response
+// 3.global error handling middleware
+async createPerson (req: Request, res: Response){
+    const {name, age}= req.body; //clinet request body/input
+    if(!name){
+        throw new HttpException(400, "Name is reuired");
+    }
+    if(!age){
+        throw new HttpException(400, "Age is required");
+    }
+    //database operation
+    const newPerson = {
+        id: data.length + 1,
+        name,
+        age
+    }
+    data.push(newPerson);
+    return ApiResponseHelper.success(res, newPerson, 201, "Person create");
+}
 }
