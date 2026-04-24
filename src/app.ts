@@ -1,9 +1,15 @@
-import express, { Application, Request, Response} from 'express';
+import express, { Application, NextFunction, Request, Response} from 'express';
+
+// import {router} from './routes/person.route'; => no because in person.route there has been use of default while exporting
+import personRoute from './routes/person.route';
+
 
 const app: Application = express();
 
 app.use(express.json()); //use json a request
 app.use(express.urlencoded({extended: true})); //use form-urlencoded as request
+
+app.use("/api/persons",personRoute);
 
 type Product ={
     id: number;
@@ -58,19 +64,19 @@ app.get(
     }
 );
 
-app.get(
-  "/api/products/:id",
-  (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
-    const product = products.find(p => p.id === id);
+// app.get(
+//   "/api/products/:id",
+//   (req: Request, res: Response) => {
+//     const id = parseInt(req.params.id);
+//     const product = products.find(p => p.id === id);
 
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
 
-    res.json(product);
-  }
-);
+//     res.json(product);
+//   }
+// );
 
 //3. POST-Create
 app.post(
@@ -87,20 +93,20 @@ app.post(
     }
 );
 
-app.post(
-    "/api/products",
-    (req: Request, res: Response)=>{
-        const {name, product} = req.body;
-        const newProduct= {
-            id: product.length+1,
-            name: name || 'Unknown Product',
-            price: price || 0,
-            category
-        };
-        product.push(newProduct);
-        return res.status(404).json(newProduct);
-    }
-);
+// app.post(
+//     "/api/products",
+//     (req: Request, res: Response)=>{
+//         const {name, product} = req.body;
+//         const newProduct= {
+//             id: product.length+1,
+//             name: name || 'Unknown Product',
+//             price: price || 0,
+//             category
+//         };
+//         product.push(newProduct);
+//         return res.status(404).json(newProduct);
+//     }
+// );
 //Update (get one and update)
 //4.1 PUT - update whole/most resource
 //4.2 PATCH - update part of resource
@@ -121,25 +127,25 @@ app.put(
     }
 );
 
-app.put(
-    "/products/:id",
-    (req: Request, res: Response) => {
-    const id = parseInt(req.params.id);
-    const product = products.find(p => p.id === id);
+// app.put(
+//     "/products/:id",
+//     (req: Request, res: Response) => {
+//     const id = parseInt(req.params.id);
+//     const product = products.find(p => p.id === id);
 
-    if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-    }
+//     if (!product) {
+//         return res.status(404).json({ message: "Product not found" });
+//     }
 
-    const { name, price, category } = req.body;
+//     const { name, price, category } = req.body;
 
-    product.name = name || "Unknown Product";
-    product.price = price || 0;
-    product.category = category;
+//     product.name = name || "Unknown Product";
+//     product.price = price || 0;
+//     product.category = category;
 
-    res.json(product);
-    }
-);
+//     res.json(product);
+//     }
+// );
 
 //5. DELETE - delete one
 app.delete(
@@ -152,25 +158,25 @@ app.delete(
     }
 );
 
-app.delete(
-    "/products/:id", 
-    (req: Request, res: Response) => {
-    const { id } = req.params;
+// app.delete(
+//     "/products/:id", 
+//     (req: Request, res: Response) => {
+//     const { id } = req.params;
 
-    const index = products.findIndex(
-        (p) => p.id === parseInt(id)
-    );
+//     const index = products.findIndex(
+//         (p) => p.id === parseInt(id)
+//     );
 
-    if (index === -1) {
-        return res.status(404).json({
-        message: "Product not found"
-        });
-    }
+//     if (index === -1) {
+//         return res.status(404).json({
+//         message: "Product not found"
+//         });
+//     }
 
-    const deleted = products.splice(index, 1);
-    res.json(deleted[0]);
-    }
-);
+//     const deleted = products.splice(index, 1);
+//     res.json(deleted[0]);
+//     }
+// );
 
 
 app.get(
@@ -203,15 +209,40 @@ app.get(
         return res.send(`Hello ${title} ${name}, you are ${age} years old and your category is ${category}`);
     }
 );
+// localhost:8088/hello/John/21?title=Dr.&category=doctor
 
-const PORT: number = 8088;
-
-app.listen(
-    PORT,
-    ()=>{
-        console.log(`Server running: ${PORT}`);
+// global handler if no route match, return 404
+app.use(
+    (req: Request, res: Response)=>{
+        return res.status(404).json({message: "Route not found"});
     }
 );
+
+// global error handler
+app.use(
+    (err: Error, req: Request, res: Response, next: NextFunction)=> {
+        return res.status(500).json(
+            {message: err.message ?? "Internal Server Error"}
+        );
+    }
+);
+
+
+const PORT: number = 8088;
+const dummy: string ="Dummy"
+
+export{
+    PORT,
+    dummy
+}
+export default app;
+
+// app.listen(
+//     PORT,
+//     ()=>{
+//         console.log(`Server running: ${PORT}`);
+//     }
+// );
 //execute script: npx tsx --watch app.ts
 //http://localhost:8088
 
