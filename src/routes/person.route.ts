@@ -10,4 +10,10 @@ router.get(
     "/",
    personController.getAllPerson
 )
+
+router.post(
+    "/",
+    personController.createPerson
+)
+
 export default router;
