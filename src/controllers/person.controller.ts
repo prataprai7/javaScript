@@ -3,6 +3,17 @@ import {data }from "../models/person.model";
 import { HttpException } from "../exceptions/http-exception";
 import { ApiResponseHelper } from "../utils/api-response";
 
+import {z} from "zod";
+
+const PersonScheme = z.object(
+    {
+        id: z.number(),
+        name: z.string(),
+        age: z.number().min(0, "Age must be a positive number")
+    }
+)
+export type Person = z.infer<typeof PersonScheme>;
+
 
 export class PersonController{
     //1. Get - get all
