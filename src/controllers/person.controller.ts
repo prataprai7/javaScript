@@ -2,22 +2,10 @@ import { Request, Response } from "express";
 import {data }from "../models/person.model";
 import { HttpException } from "../exceptions/http-exception";
 import { ApiResponseHelper } from "../utils/api-response";
-
+import { CreatePersonDTO } from "../dtos/person.dto";
 import {z} from "zod";
 
-const PersonScheme = z.object(
-    {
-        id: z.number(),
-        name: z.string(),
-        age: z.number().min(0, "Age must be a positive number")
-    }
-)
-// Domain model - Person
-export type Person = z.infer<typeof PersonScheme>;
-// DTO - Data transer object(can be any input/output to client)
-export const CreatePersonDTO = PersonScheme.omit({id: true});
-// for create, id is not required 
-export type CreatePersonDTO = z.infer<typeof CreatePersonDTO>;
+
 
 
 export class PersonController{
