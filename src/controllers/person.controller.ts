@@ -12,7 +12,12 @@ const PersonScheme = z.object(
         age: z.number().min(0, "Age must be a positive number")
     }
 )
+// Domain model - Person
 export type Person = z.infer<typeof PersonScheme>;
+// DTO - Data transer object(can be any input/output to client)
+export const CreatePersonDTO = PersonScheme.omit({id: true});
+// for create, id is not required 
+export type CreatePersonDTO = z.infer<typeof CreatePersonDTO>;
 
 
 export class PersonController{
@@ -43,13 +48,22 @@ export class PersonController{
 // 2.consistent api response
 // 3.global error handling middleware
 async createPerson (req: Request, res: Response){
-    const {name, age}= req.body; //clinet request body/input
-    if(!name){
-        throw new HttpException(400, "Name is reuired");
+    const parseResult = CreatePersonDTO.safeParse(req.body);
+    if(!parseResult.success){
+        throw new HttpException(
+            400,
+            z.prettifyError(parseResult.error)
+        );
     }
-    if(!age){
-        throw new HttpException(400, "Age is required");
-    }
+    const {name, age} = parseResult.data; //validate data
+
+    // const {name, age}= req.body; //clinet request body/input
+    // if(!name){//logic through exception handling
+    //     throw new HttpException(400, "Name is reuired");
+    // }
+    // if(!age){
+    //     throw new HttpException(400, "Age is required");
+    // }
     //database operation
     const newPerson = {
         id: data.length + 1,
